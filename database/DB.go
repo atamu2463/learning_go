@@ -29,15 +29,27 @@ func MigrateDB(db *gorm.DB) {
 	log.Println("マイグレーションに成功しました")
 }
 
-func InsertSeedData(db *gorm.DB) {
+func CheckDBOrInsertSeed(db *gorm.DB) {
+	//レコード件数を取得
+	var count int64
+
+	result := db.Model(&models.User{}).Count(&count)
+	if result.Error != nil {
+		log.Fatal("レコード件数の取得に失敗しました", result.Error)
+	}
+
+	if count > 0 {
+		log.Println("DBにレコードが存在するため、シードデータは挿入されませんでした")
+		return
+	}
+
 	//シードデータを挿入
 	sampleUser := models.User{
-		ID:       1,
 		Name:     "sampleuser",
 		Password: "samplepassword",
 	}
 
-	result := db.Create(&sampleUser)
+	result = db.Create(&sampleUser)
 	if result.Error != nil {
 		log.Fatal("シードデータの挿入に失敗しました", result.Error)
 	}
