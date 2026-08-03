@@ -11,9 +11,9 @@ import (
 func main() {
 	router := gin.Default()
 
-	database.ConnectDB()
-	database.MigrateDB(database.ConnectDB())
-	database.InsertSeedData(database.ConnectDB())
+	db := database.ConnectDB()
+	database.MigrateDB(db)
+	database.CheckDBOrInsertSeed(db)
 
 	router.GET("/", func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{
